@@ -1,0 +1,22 @@
+{
+   "name": "apollo-server-gql",
+   "version": "1.0.0",
+   "main": "index.ts",
+   "license": "MIT",
+   "scripts": {
+      "client": "cd client && yarn start",
+      "server": "nodemon server/index.ts",
+      "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+   },
+   "dependencies": {
+      "apollo-server": "^2.8.1",
+      "graphql": "^14.4.2",
+      "ts-node": "^8.3.0"
+   },
+   "devDependencies": {
+      "@types/graphql": "^14.2.3",
+      "concurrently": "^4.1.1",
+      "nodemon": "^1.19.1",
+      "typescript": "^3.5.3"
+   }
+}
