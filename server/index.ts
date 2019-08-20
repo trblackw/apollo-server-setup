@@ -1,54 +1,24 @@
- const { ApolloServer , gql } = require ('apollo-server');
-
-type Book = { title: string, author: string }
-const books: Book[] = [
-   {
-     title: 'Harry Potter and the Chamber of Secrets',
-     author: 'J.K. Rowling',
-   },
-   {
-     title: 'Jurassic Park',
-     author: 'Michael Crichton',
-   },
- ];
-
- const typeDefs = gql`
-   type Book {
-      title: String
-      author: String
-   }
-
-   type Query {
-      books: [Book]
-   }
-
-   type Mutation {
-      addBook(title: String!, author: String!): Book!
-   }
-
-   input BookInfo {
-      title: String
-      author: String
-   }
- `
-
-const resolvers = {
-   Query: {
-     books: () => books,
-   },
-   Mutation: {
-      addBook: (_: any, { title, author }: { title: string, author: string }) => {
-         const newBook = { title, author };
-         return newBook;
-      }
-   }
- };
-
+const { ApolloServer } = require('apollo-server-express');
+const express = require('express');
+const resolvers = require('./resolvers');
+const typeDefs = require('./typeDefs');
+const morgan = require("morgan");
+const mongoose = require('./config/db')
 //ApolloServer can be started by passing type definitions (typeDefs) and the resolvers
 // responsible for fetching the data for those types.
- const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers });
 
-(async () => {
-   const { url } = await server.listen();
-   console.log(`🚀  Server ready at ${url}`);
-})()
+// Initialize an Express application
+const app = express();
+app.use(morgan('dev'));
+
+//Use the Express application as middleware in Apollo server
+server.applyMiddleware({ app });
+
+const port = 3001 || process.env.PORT;
+app.listen(port, () => {
+   console.log(`🚀  Server ready at http://localhost:${port}${server.graphqlPath}`);
+});
+
+
+export {}
