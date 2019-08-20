@@ -22,36 +22,33 @@ const ADD_BOOK = gql`
 `;
 
 const App: React.FC = () => {
-   const { loading, error, data } = useQuery(GET_BOOK_TITLES);
-   const [addBook, { data: book }] = useMutation(ADD_BOOK);
-   const [newBook, setNewBook] = useState<{ title: string; author: string }>({ title: '', author: '' });
+   // const { loading, error, data } = useQuery(GET_BOOK_TITLES);
+   // const [addBook, { data: book }] = useMutation(ADD_BOOK);
+   // const [newBook, setNewBook] = useState<{ title: string; author: string }>({ title: '', author: '' });
 
-   useEffect(() => {
-      console.log('ADDED BOOK', book)
-   }, [book])
+   // useEffect(() => {
+   //    console.log('ADDED BOOK', book)
+   // }, [book])
 
-   const handleInput = (e: ChangeEvent<HTMLInputElement>): void => {
-      e.persist()
-      setNewBook(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
-   };
+   // const handleInput = (e: ChangeEvent<HTMLInputElement>): void => {
+   //    e.persist()
+   //    setNewBook(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+   // };
 
-   const handleAddBook = () => {
-      debugger;
-      addBook({ variables: { title: newBook.title, author: newBook.author }})
-   }
-   if (!error) {
-      console.log(data);
-   }
-   return loading ? (
-      <div>Loading...</div>
-   ) : (
+   // const handleAddBook = () => {
+   //    debugger;
+   //    addBook({ variables: { title: newBook.title, author: newBook.author }})
+   // }
+   // if (!error) {
+   //    console.log(data);
+   // }
+   // return loading ? (
+   //    <div>Loading...</div>
+   // ) : 
+   return (
       <div className='App'>
          <header className='App-header'>
-            <label htmlFor='title'>Title</label>
-            <input name='title' type='text' value={newBook.title} onChange={handleInput} style={{ marginBottom: '2em', padding: '5px 7px'}} />
-            <label htmlFor='author'>Author</label>
-            <input type='text' name='author' value={newBook.author} onChange={handleInput} style={{ padding: '5px 7px'}}/>
-            <button onClick={handleAddBook}>Add book</button>
+           <div>hey</div>
          </header>
       </div>
    );
