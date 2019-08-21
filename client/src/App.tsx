@@ -4,10 +4,10 @@ import './App.css';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
-const GET_BOOK_TITLES = gql`
-   query getBookTitles {
-      books {
-         title
+const GET_MESSAGES = gql`
+   {
+      messages {
+         author
       }
    }
 `;
@@ -22,7 +22,7 @@ const ADD_BOOK = gql`
 `;
 
 const App: React.FC = () => {
-   // const { loading, error, data } = useQuery(GET_BOOK_TITLES);
+   const { loading, error, data } = useQuery(GET_MESSAGES);
    // const [addBook, { data: book }] = useMutation(ADD_BOOK);
    // const [newBook, setNewBook] = useState<{ title: string; author: string }>({ title: '', author: '' });
 
@@ -39,13 +39,13 @@ const App: React.FC = () => {
    //    debugger;
    //    addBook({ variables: { title: newBook.title, author: newBook.author }})
    // }
-   // if (!error) {
-   //    console.log(data);
-   // }
+   if (!error) {
+      console.log(data);
+   }
    // return loading ? (
    //    <div>Loading...</div>
    // ) : 
-   return (
+   return loading ? <div>Loading...</div> : (
       <div className='App'>
          <header className='App-header'>
            <div>hey</div>
