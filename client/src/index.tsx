@@ -9,7 +9,7 @@ import { createHttpLink } from 'apollo-link-http';
 import { ApolloProvider } from '@apollo/react-hooks';
 
 const link = createHttpLink({
-   uri: 'http://localhost:4000/'
+   uri: 'http://localhost:3001/graphql'
 });
 
 // const authLink = setContext((_, { headers }) => ({
