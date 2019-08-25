@@ -1,5 +1,6 @@
 export interface MessageType {
-   body: string;
-   author: string;
-   created_at: string;
+   id: number,
+   from: string,
+   message: string,
+   created_at: string
 }

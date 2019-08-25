@@ -1,8 +1,8 @@
 const { Schema, model }  = require('mongoose');
 
 const messageSchema = new Schema({
-   body: { type: String, required: true },
-   author: { type: String, required: true },
+   from: { type: String, required: true },
+   message: { type: String, required: true },
    created_at: { type: Date, default: Date.now }
 })
 
