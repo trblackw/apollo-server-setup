@@ -2,44 +2,39 @@ import React, { FormEvent, useEffect, FC, useRef, useState, Fragment, ChangeEven
 import styled from 'styled-components';
 import useInputValue from '../hooks/useInputValue';
 import { RouteComponentProps } from '@reach/router';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-
-const GET_MESSAGES = gql`
-   {
-      messages {
-         body
-      }
-   }
-`;
-
-const ADD_MESSAGE = gql`
-   mutation($author: String!, $body: String!) {
-      addMessage(author: $author, body: $body) {
-         author
-         body
-      }
-   }
-`;
+import { QUERIES, MUTATIONS, SUBSCRIPTIONS } from '../graphql';
 
 interface Message {
-   author: string;
-   body: string;
-   created_at: string;
+   id: number;
+   from: string;
+   message: string;
+}
+interface NewMessage {
+   from: string;
+   message: string;
 }
 interface Props extends RouteComponentProps {}
 const ChatBox: FC<Props> = (): JSX.Element => {
-   const { loading, error, data: messages } = useQuery(GET_MESSAGES),
-      [addMessage, { data: addedMessage }] = useMutation(ADD_MESSAGE),
-      [newMessage, setNewMessage] = useState({
-         author: '',
+   const { loading, error, data } = useQuery(QUERIES.getMessages),
+      [sendMessage] = useMutation(MUTATIONS.sendMessage),
+      [clearMessages] = useMutation(MUTATIONS.clearMessages),
+      //@ts-ignore
+      {data: subdata, loading: subLoading } = useSubscription(SUBSCRIPTIONS.messageSubscription),
+      [newMessage, setNewMessage] = useState<NewMessage>({
+         from: 'Tucker',
          message: ''
       }),
       inputRef = useRef<HTMLInputElement>(null);
 
+
    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      addMessage({ variables: { body: newMessage.message, author: newMessage.author } });
+      sendMessage({ variables: { from: newMessage.from, message: newMessage.message } });
+      //@ts-ignore
+      clearInput();
+      setNewMessage((prev: any) => ({ ...prev, message: '' }));
    };
    const clearInput = () => inputRef && inputRef.current && (inputRef.current.value = '');
 
@@ -48,24 +43,17 @@ const ChatBox: FC<Props> = (): JSX.Element => {
       setNewMessage(prevMessage => ({ ...prevMessage, [e.target.name]: e.target.value }));
    };
 
-   useEffect(
-      () => {
-
-            console.log(messages.messages)
-
-      },
-      [messages]
-   );
    return (
       <Container>
          <MessageListContainer>
-            {messages && messages.messages && messages.messages.length && (
+            {!subLoading && subdata.messageSent.message}
+            {data.messages && (
                <MessageList>
-                  {messages.messages.map(({ author, body }: Message, i: number): JSX.Element => (
-                     <Fragment key={i}>
-                        <li>{body}</li>
+                  {data.messages.map(({ from, message, id }: Message): JSX.Element => (
+                     <Fragment key={id}>
+                        <li>{message}</li>
                         <br />
-                        <TimeStamp>{author}</TimeStamp>
+                        <TimeStamp>{from}</TimeStamp>
                         <Hr />
                      </Fragment>
                   ))}
@@ -73,10 +61,13 @@ const ChatBox: FC<Props> = (): JSX.Element => {
             )}
          </MessageListContainer>
          <Form onSubmit={handleSubmit}>
-            <Input placeholder='Author' value={newMessage.author} onChange={handleInput} name='author' />
-            <Input placeholder='Message' value={newMessage.message} onChange={handleInput} name='message' />
-            <Button>Send</Button>
+            {/* <Input placeholder='Author' value={newMessage.author} onChange={handleInput} name='author' /> */}
+            <Input placeholder='Message' ref={inputRef} value={newMessage.message} onChange={handleInput} name='message' />
+            <Button type='submit'>Send</Button>
          </Form>
+         <Button type='button' color='hsl(0, 61%, 50%)' onClick={() => clearMessages()}>
+            Clear all
+         </Button>
       </Container>
    );
 };
@@ -130,7 +121,7 @@ const Input = styled.input.attrs(({ ref, placeholder, name }) => ({ type: 'text'
   border-radius: 3px;
 `;
 
-const Button = styled.button.attrs(() => ({ type: 'submit' }))`
+const Button = styled.button.attrs(({ type }) => ({ type }))`
    margin-left: .5em;
    padding: 4px 5px;
    border-radius: 4px;
@@ -138,7 +129,7 @@ const Button = styled.button.attrs(() => ({ type: 'submit' }))`
    border: none;
    height: 35px;
    box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.09);
-   background-color: hsl(0, 0%, 45%);
+   background-color: ${({ color = 'hsl(0, 0%, 45%)' }) => color};
    color: whitesmoke;
    &:hover {
       cursor: pointer;
